@@ -1,0 +1,20 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  reservation-api:
+    build:
+      context: ./Services/ReservationService
+      dockerfile: Reservation.Api/dockerfile
+    environment:
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=guest
+      - RabbitMQ__Password=guest
+      - RabbitMQ__Port=5672
+    ports:
+      - "5001:8080"
+    depends_on:
+      - rabbitmq
