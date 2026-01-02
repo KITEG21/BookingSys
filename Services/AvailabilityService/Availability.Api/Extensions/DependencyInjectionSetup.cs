@@ -10,7 +10,6 @@ public static class DependencyInjectionSetup
     public static IServiceCollection AddDependencyInjectionSetup(this IServiceCollection services,
         IConfiguration configuration)
     {
-        // RabbitMQ connection
         services.AddSingleton<IConnection>(sp =>
         {
             var factory = new ConnectionFactory
@@ -20,17 +19,32 @@ public static class DependencyInjectionSetup
                 Password = configuration["RabbitMQ:Password"] ?? "guest",
                 Port = int.TryParse(configuration["RabbitMQ:Port"], out var port) ? port : 5672
             };
-            return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+
+            var attempts = 0;
+            var maxAttempts = 10;
+            var delayMs = 2000;
+            while (true) try
+                {
+                    return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+                }
+                catch (Exception ex) when (++attempts <= maxAttempts)
+                {
+                    // log here using a logger from sp.GetRequiredService<ILogger<...>> if available
+                    Thread.Sleep(delayMs);
+                    Console.WriteLine(ex.Message);
+                }
         });
 
-        // Event bus
         services.AddSingleton<IEventBus, RabbitMqEventBus>();
 
         // Application services
         services.AddSingleton<AvailabilityService>();
 
-        // Consumer
         services.AddSingleton<ReservationRequestedConsumer>();
+
+
+
+
 
         return services;
     }

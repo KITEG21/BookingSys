@@ -11,6 +11,7 @@ public class Reservation : Entity
     public DateTime End { get; private set; }
     public ReservationStatus Status { get; private set; }   
 
+    public Reservation() { }
 
     public Reservation(Guid clientId, DateTime start, DateTime end)
     {

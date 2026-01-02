@@ -1,6 +1,8 @@
 
+using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using Reservation.Api.ServicesExtensions;
+using Reservation.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ReservationDbContext>();
+    db.Database.Migrate();
 }
 
 app.MapControllers();

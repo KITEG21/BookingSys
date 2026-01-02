@@ -21,7 +21,7 @@ app.MapControllers();
 
 // Start the consumer
 var consumer = app.Services.GetRequiredService<ReservationRequestedConsumer>();
-consumer.Start();
+await consumer.Start();
 
 app.Run();
 

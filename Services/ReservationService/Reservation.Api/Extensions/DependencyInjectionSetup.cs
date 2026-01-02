@@ -1,7 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using Reservation.Application.Commands.Post;
 using Reservation.Application.Interfaces;
 using Reservation.Infrastructure.Messaging;
+using Reservation.Infrastructure.Persistence;
+using Reservation.Infrastructure.Repositories;
 
 namespace Reservation.Api.ServicesExtensions;
 
@@ -28,6 +31,10 @@ public static class DependencyInjectionSetup
         // Register the event bus
         services.AddSingleton<IEventBus, RabbitMqEventBus>();
 
+        services.AddDbContext<ReservationDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddScoped<IReservationRepository, EfReservationRepository>();
 
 
 
