@@ -7,14 +7,16 @@ namespace Reservation.Domain.Entities;
 public class Reservation : Entity
 {
     public Guid ClientId { get; private set; }
-    public DateTime ReservationDate { get; private set; }
+    public DateTime Start { get; private set; }
+    public DateTime End { get; private set; }
     public ReservationStatus Status { get; private set; }   
 
 
-    public Reservation(Guid clientId, DateTime reservationDate)
+    public Reservation(Guid clientId, DateTime start, DateTime end)
     {
         ClientId = clientId;
-        ReservationDate = reservationDate;
+        Start = start;
+        End = end;
         Status = ReservationStatus.Pending;
     }
 

@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Reservation.Domain\Reservation.Domain.csproj" />
+    <ProjectReference Include="..\Availability.Domain\Availability.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\" />
-    <Folder Include="Commands\Post\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
   <PropertyGroup>

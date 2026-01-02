@@ -1,15 +1,16 @@
+using Availability.Application.Interfaces;
+using Availability.Application.Services;
+using Availability.Infrastructure.Messaging;
 using RabbitMQ.Client;
-using Reservation.Application.Commands.Post;
-using Reservation.Application.Interfaces;
-using Reservation.Infrastructure.Messaging;
 
-namespace Reservation.Api.ServicesExtensions;
+namespace Availability.Api.ServicesExtensions;
 
 public static class DependencyInjectionSetup
 {
     public static IServiceCollection AddDependencyInjectionSetup(this IServiceCollection services,
         IConfiguration configuration)
     {
+        // RabbitMQ connection
         services.AddSingleton<IConnection>(sp =>
         {
             var factory = new ConnectionFactory
@@ -19,17 +20,17 @@ public static class DependencyInjectionSetup
                 Password = configuration["RabbitMQ:Password"] ?? "guest",
                 Port = int.TryParse(configuration["RabbitMQ:Port"], out var port) ? port : 5672
             };
-            // Use GetAwaiter().GetResult() to synchronously create the async connection in DI
             return factory.CreateConnectionAsync().GetAwaiter().GetResult();
         });
 
-        services.AddTransient<CreateReservationCommandHandler>();
-
-        // Register the event bus
+        // Event bus
         services.AddSingleton<IEventBus, RabbitMqEventBus>();
 
+        // Application services
+        services.AddSingleton<AvailabilityService>();
 
-
+        // Consumer
+        services.AddSingleton<ReservationRequestedConsumer>();
 
         return services;
     }

@@ -1,6 +1,4 @@
-using System;
-
-namespace Reservation.Infrastructure.Messaging;
+namespace Availability.Application.Interfaces;
 
 public interface IEventBus
 {

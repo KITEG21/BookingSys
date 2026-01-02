@@ -8,15 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="7.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Reservation.Application\Reservation.Application.csproj" />
-    <ProjectReference Include="..\Reservation.Infrastructure\Reservation.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Availability.Application\Availability.Application.csproj" />
+    <ProjectReference Include="..\Availability.Infrastructure\Availability.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

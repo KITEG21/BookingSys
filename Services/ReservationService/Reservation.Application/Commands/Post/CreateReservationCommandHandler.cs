@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using Reservation.Application.Interfaces;
 using Reservation.Domain.Events;
-using Reservation.Infrastructure.Messaging;
 
 namespace Reservation.Application.Commands.Post;
 
@@ -15,12 +15,13 @@ public class CreateReservationCommandHandler
 
     public async Task<Reservation.Domain.Entities.Reservation> Handle(CreateReservationCommand command)
     {
-        var reservation = new Reservation.Domain.Entities.Reservation(command.ClientId, command.ReservationDate);
+        var reservation = new Reservation.Domain.Entities.Reservation(command.ClientId, command.Start, command.End);
 
         await _eventBus.PublishAsync(new ReservationRequested(
             reservation.Id,
             reservation.ClientId,
-            reservation.ReservationDate
+            reservation.Start,
+            reservation.End
         ));
         
         return reservation;

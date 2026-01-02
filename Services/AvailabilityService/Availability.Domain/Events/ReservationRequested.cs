@@ -1,6 +1,6 @@
 using System;
 
-namespace Reservation.Domain.Events;
+namespace Availability.Domain.Events;
 
 public record ReservationRequested
 (

@@ -9,6 +9,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReservationService", "Reser
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reservation.Api", "Services\ReservationService\Reservation.Api\Reservation.Api.csproj", "{B5A2008B-782A-4608-BA28-848FDD80D959}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AvailabilityService", "AvailabilityService", "{B8C26242-830C-4B36-AEED-2B4560524DB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Availability.Api", "services\AvailabilityService\Availability.Api\Availability.Api.csproj", "{67678CD2-FF01-4A82-9B86-8271FF536395}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Availability.Application", "services\AvailabilityService\Availability.Application\Availability.Application.csproj", "{50416942-A073-4232-8E00-871D9CF7AD87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Availability.Domain", "services\AvailabilityService\Availability.Domain\Availability.Domain.csproj", "{8D6E49E4-BDC4-43D3-99D0-3EADA688B492}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Availability.Infrastructure", "services\AvailabilityService\Availability.Infrastructure\Availability.Infrastructure.csproj", "{35A96093-7D86-4C83-9478-103327D195C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,9 +32,30 @@ Global
 		{B5A2008B-782A-4608-BA28-848FDD80D959}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5A2008B-782A-4608-BA28-848FDD80D959}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5A2008B-782A-4608-BA28-848FDD80D959}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67678CD2-FF01-4A82-9B86-8271FF536395}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67678CD2-FF01-4A82-9B86-8271FF536395}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67678CD2-FF01-4A82-9B86-8271FF536395}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67678CD2-FF01-4A82-9B86-8271FF536395}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50416942-A073-4232-8E00-871D9CF7AD87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50416942-A073-4232-8E00-871D9CF7AD87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50416942-A073-4232-8E00-871D9CF7AD87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50416942-A073-4232-8E00-871D9CF7AD87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D6E49E4-BDC4-43D3-99D0-3EADA688B492}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D6E49E4-BDC4-43D3-99D0-3EADA688B492}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D6E49E4-BDC4-43D3-99D0-3EADA688B492}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D6E49E4-BDC4-43D3-99D0-3EADA688B492}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35A96093-7D86-4C83-9478-103327D195C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35A96093-7D86-4C83-9478-103327D195C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35A96093-7D86-4C83-9478-103327D195C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35A96093-7D86-4C83-9478-103327D195C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{76862729-56D4-4D48-ABB6-4BC70691A749} = {6EAFB99F-7690-4B34-8F65-BCD130FF5C24}
 		{B5A2008B-782A-4608-BA28-848FDD80D959} = {76862729-56D4-4D48-ABB6-4BC70691A749}
+		{B8C26242-830C-4B36-AEED-2B4560524DB1} = {6EAFB99F-7690-4B34-8F65-BCD130FF5C24}
+		{67678CD2-FF01-4A82-9B86-8271FF536395} = {B8C26242-830C-4B36-AEED-2B4560524DB1}
+		{50416942-A073-4232-8E00-871D9CF7AD87} = {B8C26242-830C-4B36-AEED-2B4560524DB1}
+		{8D6E49E4-BDC4-43D3-99D0-3EADA688B492} = {B8C26242-830C-4B36-AEED-2B4560524DB1}
+		{35A96093-7D86-4C83-9478-103327D195C3} = {B8C26242-830C-4B36-AEED-2B4560524DB1}
 	EndGlobalSection
 EndGlobal

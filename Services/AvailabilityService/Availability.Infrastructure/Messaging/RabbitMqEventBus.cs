@@ -1,10 +1,10 @@
 using System;
 using System.Text;
 using System.Text.Json;
+using Availability.Application.Interfaces;
 using RabbitMQ.Client;
-using Reservation.Application.Interfaces;
 
-namespace Reservation.Infrastructure.Messaging;
+namespace Availability.Infrastructure.Messaging;
 
 public class RabbitMqEventBus : IEventBus, IDisposable
 {

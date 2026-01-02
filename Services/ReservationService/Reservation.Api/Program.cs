@@ -1,5 +1,6 @@
-using Contracting.WebApi.ServicesExtensions;
+
 using RabbitMQ.Client;
+using Reservation.Api.ServicesExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
