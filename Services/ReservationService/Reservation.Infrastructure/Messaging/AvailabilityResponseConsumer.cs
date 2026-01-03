@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Reservation.Domain.Events;
@@ -16,12 +17,12 @@ public class AvailabilityResponseConsumer
 
     private readonly IConnection _connection;
     private IChannel? _channel;
-    private readonly ReservationSagaOrchestrator _handler;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public AvailabilityResponseConsumer(IConnection connection, ReservationSagaOrchestrator handler)
+    public AvailabilityResponseConsumer(IConnection connection, IServiceScopeFactory scopeFactory)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-        _handler = handler;
+        _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
     }
 
     public async Task Start()
@@ -41,17 +42,21 @@ public class AvailabilityResponseConsumer
                 var routingKey = ea.RoutingKey;
                 var json = Encoding.UTF8.GetString(ea.Body.ToArray());
 
+                // Create a scope per message to resolve scoped services (DbContext, etc.)
+                using var scope = _scopeFactory.CreateScope();
+                var orchestrator = scope.ServiceProvider.GetRequiredService<ReservationSagaOrchestrator>();
+
                 if (routingKey == LockedKey)
                 {
                     var evt = JsonSerializer.Deserialize<AvailabilityLocked>(json);
                     if (evt is null) { await _channel.BasicNackAsync(ea.DeliveryTag, false, false); return; }
-                    await _handler.HandleAsync(evt);
+                    await orchestrator.HandleAsync(evt);
                 }
                 else if (routingKey == RejectedKey)
                 {
                     var evt = JsonSerializer.Deserialize<AvailabilityRejected>(json);
                     if (evt is null) { await _channel.BasicNackAsync(ea.DeliveryTag, false, false); return; }
-                    await _handler.HandleAsync(evt);
+                    await orchestrator.HandleAsync(evt);
                 }
 
                 await _channel.BasicAckAsync(ea.DeliveryTag, false);

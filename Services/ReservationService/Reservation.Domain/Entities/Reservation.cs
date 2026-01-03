@@ -13,21 +13,23 @@ public class Reservation : Entity
 
     public Reservation() { }
 
-    public Reservation(Guid clientId, DateTime start, DateTime end)
+    public Reservation(Guid clientId, DateTime start, DateTime end) : base()
     {
         ClientId = clientId;
-        Start = start;
-        End = end;
+        Start = start.Kind == DateTimeKind.Utc ? start : DateTime.SpecifyKind(start, DateTimeKind.Utc);
+        End = end.Kind == DateTimeKind.Utc ? end : DateTime.SpecifyKind(end, DateTimeKind.Utc);
         Status = ReservationStatus.Pending;
     }
 
     public void Confirm()
     {
         Status = ReservationStatus.Confirmed;
+        Touch();
     }
 
     public void Cancel()
     {
         Status = ReservationStatus.Cancelled;
+        Touch();
     }
 }

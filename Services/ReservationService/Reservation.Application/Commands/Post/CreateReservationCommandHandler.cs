@@ -1,29 +1,31 @@
 using System;
 using System.Threading.Tasks;
 using Reservation.Application.Interfaces;
+using Reservation.Application.Saga;
 using Reservation.Domain.Events;
 
 namespace Reservation.Application.Commands.Post;
 
 public class CreateReservationCommandHandler
 {
-    private readonly IEventBus _eventBus;
-    public CreateReservationCommandHandler(IEventBus eventBus)
+    private readonly IReservationRepository _repository;
+    private readonly ReservationSagaOrchestrator _orchestrator;
+
+    public CreateReservationCommandHandler(IReservationRepository repository, ReservationSagaOrchestrator orchestrator)
     {
-        _eventBus = eventBus;
+        _repository = repository;
+        _orchestrator = orchestrator;
     }
 
-    public async Task<Reservation.Domain.Entities.Reservation> Handle(CreateReservationCommand command)
+    public async Task<Domain.Entities.Reservation> Handle(CreateReservationCommand command)
     {
-        var reservation = new Reservation.Domain.Entities.Reservation(command.ClientId, command.Start, command.End);
+        var reservation = new Domain.Entities.Reservation(command.ClientId, command.Start, command.End);
 
-        await _eventBus.PublishAsync(new ReservationRequested(
-            reservation.Id,
-            reservation.ClientId,
-            reservation.Start,
-            reservation.End
-        ));
-        
+        await _repository.AddAsync(reservation);
+
+        // Inicia el Saga (persiste el state y publica ReservationRequested internamente)
+        await _orchestrator.StartAsync(reservation);
+
         return reservation;
     }
 }
