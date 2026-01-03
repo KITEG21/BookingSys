@@ -33,6 +33,7 @@ public class SagaRepository : ISagaRepository
             case "WaitingForAvailability": saga.MarkWaitingForAvailability(); break;
             case "Confirmed": saga.Confirm(); break;
             case "Rejected": saga.Reject(); break;
+            case "Completed": saga.Complete(); break;
             default: /* Started or unknown */ break;
         }
         return saga;

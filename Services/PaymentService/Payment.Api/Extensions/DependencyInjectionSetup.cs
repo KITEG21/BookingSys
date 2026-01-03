@@ -1,20 +1,16 @@
-using Microsoft.EntityFrameworkCore;
+using Payment.Application.Handlers;
+using Payment.Application.Interfaces;
+using Payment.Infrastructure.Messaging;
 using RabbitMQ.Client;
-using Reservation.Application.Commands.Post;
-using Reservation.Application.Interfaces;
-using Reservation.Application.Saga;
-using Reservation.Infrastructure.Messaging;
-using Reservation.Infrastructure.Persistence;
-using Reservation.Infrastructure.Repositories;
 
-namespace Reservation.Api.ServicesExtensions;
+namespace Payment.Api.Extensions;
 
 public static class DependencyInjectionSetup
 {
     public static IServiceCollection AddDependencyInjectionSetup(this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Register Lazy<IConnection> to defer connection until first use
+        // RabbitMQ - lazy connection with retry
         services.AddSingleton<Lazy<IConnection>>(sp =>
         {
             return new Lazy<IConnection>(() =>
@@ -49,20 +45,13 @@ public static class DependencyInjectionSetup
             });
         });
 
-        // Register IConnection that resolves the Lazy value
         services.AddSingleton<IConnection>(sp => sp.GetRequiredService<Lazy<IConnection>>().Value);
 
-        services.AddTransient<CreateReservationCommandHandler>();
-
-        services.AddDbContext<ReservationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-
-        services.AddScoped<IReservationRepository, EfReservationRepository>();
-        services.AddScoped<ISagaRepository, SagaRepository>();
-        services.AddScoped<ReservationSagaOrchestrator>();
-        services.AddSingleton<AvailabilityResponseConsumer>();
-        services.AddSingleton<PaymentSettledConsumer>();
+        // Event bus
         services.AddSingleton<IEventBus, RabbitMqEventBus>();
+
+        // Command handler
+        services.AddTransient<SettlePaymentCommandHandler>();
 
         return services;
     }

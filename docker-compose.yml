@@ -56,3 +56,20 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+
+  payment-api:
+      build:
+        context: ./Services/PaymentService
+        dockerfile: Payment.Api/dockerfile
+      environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ASPNETCORE_URLS=http://+:8080
+        - RabbitMQ__HostName=rabbitmq
+        - RabbitMQ__Port=5672
+        - RabbitMQ__UserName=guest
+        - RabbitMQ__Password=guest
+      ports:
+        - "5003:8080"
+      depends_on:
+        rabbitmq:
+          condition: service_healthy

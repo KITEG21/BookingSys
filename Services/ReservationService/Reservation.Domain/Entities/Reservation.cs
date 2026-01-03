@@ -9,7 +9,7 @@ public class Reservation : Entity
     public Guid ClientId { get; private set; }
     public DateTime Start { get; private set; }
     public DateTime End { get; private set; }
-    public ReservationStatus Status { get; private set; }   
+    public ReservationStatus Status { get; private set; }
 
     public Reservation() { }
 
@@ -30,6 +30,11 @@ public class Reservation : Entity
     public void Cancel()
     {
         Status = ReservationStatus.Cancelled;
+        Touch();
+    }
+    public void Complete()
+    {
+        Status = ReservationStatus.Completed;
         Touch();
     }
 }

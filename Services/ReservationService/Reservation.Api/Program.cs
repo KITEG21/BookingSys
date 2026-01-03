@@ -36,6 +36,9 @@ using (var scope = app.Services.CreateScope())
 var availabilityConsumer = app.Services.GetRequiredService<AvailabilityResponseConsumer>();
 _ = availabilityConsumer.Start();
 
+var paymentConsumer = app.Services.GetRequiredService<PaymentSettledConsumer>();
+_ = paymentConsumer.Start();
+
 app.MapControllers();
 
 app.Run();

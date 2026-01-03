@@ -5,5 +5,6 @@ public enum ReservationSagaState
     Started,
     WaitingForAvailability,
     Confirmed,
-    Rejected
+    Rejected,
+    Completed
 }

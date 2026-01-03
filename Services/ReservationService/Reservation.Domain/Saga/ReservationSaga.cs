@@ -27,4 +27,8 @@ public class ReservationSaga
     {
         State = ReservationSagaState.Rejected;
     }
+    public void Complete()
+    {
+        State = ReservationSagaState.Completed;
+    }
 }
