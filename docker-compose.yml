@@ -41,12 +41,22 @@ services:
       - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=reservation_db;Username=postgres;Password=postgres
     depends_on:
-      - reservation-api
-      - availability-api
-      - payment-api
-      - reporting-api
-      - audit-api
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      reservation-api:
+        condition: service_started
+      availability-api:
+        condition: service_started
+      payment-api:
+        condition: service_started
+      reporting-api:
+        condition: service_started
+      audit-api:
+        condition: service_started
 
   # === Core Services ===
   reservation-api:
