@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Reservation.Application.Commands.Post;
+using Reservation.Application.Queries.GetAll;
+using Reservation.Application.Queries.GetById;
 using Reservation.Infrastructure.Messaging;
 
 namespace Reservation.Api.Controllers;
@@ -10,11 +12,18 @@ namespace Reservation.Api.Controllers;
 [ApiController]
 public class ReservationsController : ControllerBase
 {
-    private readonly CreateReservationCommandHandler _handler;
+    private readonly CreateReservationCommandHandler _createHandler;
+    private readonly GetReservationQueryHandler _getHandler;
+    private readonly GetAllReservationsQueryHandler _getAllHandler;
 
-    public ReservationsController(CreateReservationCommandHandler handler)
+    public ReservationsController(
+        CreateReservationCommandHandler createHandler,
+        GetReservationQueryHandler getHandler,
+        GetAllReservationsQueryHandler getAllHandler)
     {
-        _handler = handler;
+        _createHandler = createHandler;
+        _getHandler = getHandler;
+        _getAllHandler = getAllHandler;
     }
 
     [HttpPost]
@@ -22,7 +31,7 @@ public class ReservationsController : ControllerBase
     {
         try
         {
-            var reservation = await _handler.Handle(command);
+            var reservation = await _createHandler.Handle(command);
             return Ok(reservation);
         }
         catch (Exception ex)
@@ -30,6 +39,20 @@ public class ReservationsController : ControllerBase
             // Log the exception (add ILogger<> to the controller) and return an appropriate response.
             return Problem(detail: ex.Message, statusCode: 500);
         }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var list = await _getAllHandler.Handle(new GetAllReservationsQuery());
+        return Ok(list);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var r = await _getHandler.Handle(new GetReservationQuery(id));
+        return r is null ? NotFound() : Ok(r);
     }
 }
 

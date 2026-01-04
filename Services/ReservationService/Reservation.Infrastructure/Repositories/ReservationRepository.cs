@@ -24,4 +24,6 @@ public class EfReservationRepository : IReservationRepository
         _db.Reservations.Update(reservation);
         await _db.SaveChangesAsync();
     }
+    public async Task<IEnumerable<Domain.Entities.Reservation>> GetAllAsync() =>
+    await _db.Reservations.ToListAsync();
 }

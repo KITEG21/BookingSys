@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using Reservation.Application.Commands.Post;
 using Reservation.Application.Interfaces;
+using Reservation.Application.Queries.GetAll;
+using Reservation.Application.Queries.GetById;
 using Reservation.Application.Saga;
 using Reservation.Infrastructure.Messaging;
 using Reservation.Infrastructure.Persistence;
@@ -53,6 +55,8 @@ public static class DependencyInjectionSetup
         services.AddSingleton<IConnection>(sp => sp.GetRequiredService<Lazy<IConnection>>().Value);
 
         services.AddTransient<CreateReservationCommandHandler>();
+        services.AddTransient<GetReservationQueryHandler>();
+        services.AddTransient<GetAllReservationsQueryHandler>();
 
         services.AddDbContext<ReservationDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Reporting.Domain.ReadModels;
 
 namespace Reporting.Infrastructure.Persistence;
@@ -12,6 +13,19 @@ public class ReportingDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+        v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
+        v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+    foreach (var property in modelBuilder.Model
+             .GetEntityTypes()
+             .SelectMany(t => t.GetProperties())
+             .Where(p => p.ClrType == typeof(DateTime)))
+    {
+        property.SetValueConverter(dateTimeConverter);
+    }
+
         modelBuilder.Entity<ReservationSummary>(e =>
         {
             e.ToTable("reservation_summaries");
