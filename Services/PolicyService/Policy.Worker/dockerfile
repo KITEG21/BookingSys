@@ -1,0 +1,19 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY ["Policy.Worker/Policy.Worker.csproj", "Policy.Worker/"]
+COPY ["Policy.Application/Policy.Application.csproj", "Policy.Application/"]
+COPY ["Policy.Domain/Policy.Domain.csproj", "Policy.Domain/"]
+COPY ["Policy.Infrastructure/Policy.Infrastructure.csproj", "Policy.Infrastructure/"]
+
+RUN dotnet restore "Policy.Worker/Policy.Worker.csproj"
+
+COPY . .
+
+WORKDIR "/src/Policy.Worker"
+RUN dotnet publish "Policy.Worker.csproj" -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Policy.Worker.dll"]
