@@ -1,40 +1,45 @@
+version: '3.8'
+
 services:
   # === Infrastructure ===
   postgres:
     image: postgres:15
     container_name: bookingsys-postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: reservation_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: bookingsys
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U admin -d bookingsys"]
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3-management
     container_name: bookingsys-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
     ports:
       - "5672:5672"
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 5s
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
 
   # === API Gateway ===
   gateway:
     build:
-      context: ./Services/ApiGateway
+      context: ./ApiGateway
       dockerfile: Gateway.Api/dockerfile
     container_name: bookingsys-gateway
     ports:
@@ -51,14 +56,14 @@ services:
   # === Core Services ===
   reservation-api:
     build:
-      context: ./Services/ReservationService
+      context: ./ReservationService
       dockerfile: Reservation.Api/dockerfile
     container_name: bookingsys-reservation-api
     ports:
       - "5001:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=reservation_db;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=bookingsys;Username=admin;Password=admin123
       - RabbitMQ__HostName=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__UserName=guest
@@ -71,48 +76,53 @@ services:
 
   availability-api:
     build:
-      context: ./Services/AvailabilityService
+      context: ./AvailabilityService
       dockerfile: Availability.Api/dockerfile
     container_name: bookingsys-availability-api
     ports:
       - "5002:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=bookingsys;Username=admin;Password=admin123
       - RabbitMQ__HostName=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__UserName=guest
       - RabbitMQ__Password=guest
     depends_on:
+      postgres:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
 
   payment-api:
     build:
-      context: ./Services/PaymentService
+      context: ./PaymentService
       dockerfile: Payment.Api/dockerfile
     container_name: bookingsys-payment-api
     ports:
       - "5003:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=bookingsys;Username=admin;Password=admin123
       - RabbitMQ__HostName=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__UserName=guest
       - RabbitMQ__Password=guest
     depends_on:
+      postgres:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
 
   # === Background Workers ===
   policy-worker:
     build:
-      context: ./Services/PolicyService
+      context: ./PolicyService
       dockerfile: Policy.Worker/dockerfile
     container_name: bookingsys-policy-worker
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=reservation_db;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=bookingsys;Username=admin;Password=admin123
       - RabbitMQ__HostName=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__UserName=guest
@@ -125,12 +135,12 @@ services:
 
   notification-worker:
     build:
-      context: ./Services/NotificationService
+      context: ./NotificationService
       dockerfile: Notification.Worker/dockerfile
     container_name: bookingsys-notification-worker
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=reservation_db;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=bookingsys;Username=admin;Password=admin123
       - RabbitMQ__HostName=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__UserName=guest
@@ -144,14 +154,14 @@ services:
   # === Query Services ===
   reporting-api:
     build:
-      context: ./Services/ReportingService
+      context: ./ReportingService
       dockerfile: Reporting.Api/dockerfile
     container_name: bookingsys-reporting-api
     ports:
       - "5006:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=reservation_db;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=bookingsys;Username=admin;Password=admin123
       - RabbitMQ__HostName=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__UserName=guest
@@ -164,14 +174,14 @@ services:
 
   audit-api:
     build:
-      context: ./Services/AuditService
+      context: ./AuditService
       dockerfile: Audit.Api/dockerfile
     container_name: bookingsys-audit-api
     ports:
       - "5007:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=reservation_db;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=bookingsys;Username=admin;Password=admin123
       - RabbitMQ__HostName=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__UserName=guest
