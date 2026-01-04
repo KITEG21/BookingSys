@@ -1,0 +1,19 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY ["Audit.Api/Audit.Api.csproj", "Audit.Api/"]
+COPY ["Audit.Application/Audit.Application.csproj", "Audit.Application/"]
+COPY ["Audit.Domain/Audit.Domain.csproj", "Audit.Domain/"]
+COPY ["Audit.Infrastructure/Audit.Infrastructure.csproj", "Audit.Infrastructure/"]
+
+RUN dotnet restore "Audit.Api/Audit.Api.csproj"
+
+COPY . .
+
+WORKDIR "/src/Audit.Api"
+RUN dotnet publish "Audit.Api.csproj" -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Audit.Api.dll"]
