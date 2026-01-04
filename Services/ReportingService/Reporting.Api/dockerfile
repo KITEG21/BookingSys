@@ -1,0 +1,19 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY ["Reporting.Api/Reporting.Api.csproj", "Reporting.Api/"]
+COPY ["Reporting.Application/Reporting.Application.csproj", "Reporting.Application/"]
+COPY ["Reporting.Domain/Reporting.Domain.csproj", "Reporting.Domain/"]
+COPY ["Reporting.Infrastructure/Reporting.Infrastructure.csproj", "Reporting.Infrastructure/"]
+
+RUN dotnet restore "Reporting.Api/Reporting.Api.csproj"
+
+COPY . .
+
+WORKDIR "/src/Reporting.Api"
+RUN dotnet publish "Reporting.Api.csproj" -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Reporting.Api.dll"]
