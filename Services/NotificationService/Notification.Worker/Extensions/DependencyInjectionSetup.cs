@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Notification.Application.Interfaces;
+using Notification.Domain.Settings;
 using Notification.Infrastructure.Messaging;
 using Notification.Infrastructure.Persistence;
 using Notification.Infrastructure.Repositories;
@@ -35,13 +36,13 @@ public static class DependencyInjectionSetup
                 {
                     try
                     {
-                        logger?.LogInformation("Connecting to RabbitMQ {Host}:{Port} (attempt {Attempt})", 
+                        logger?.LogInformation("Connecting to RabbitMQ {Host}:{Port} (attempt {Attempt})",
                             factory.HostName, factory.Port, attempts + 1);
                         return factory.CreateConnectionAsync().GetAwaiter().GetResult();
                     }
                     catch (Exception ex) when (++attempts <= maxAttempts)
                     {
-                        logger?.LogWarning(ex, "RabbitMQ not ready (attempt {Attempt}/{Max}). Retrying in {Delay}ms...", 
+                        logger?.LogWarning(ex, "RabbitMQ not ready (attempt {Attempt}/{Max}). Retrying in {Delay}ms...",
                             attempts, maxAttempts, delayMs);
                         Thread.Sleep(delayMs * attempts);
                     }
@@ -58,9 +59,9 @@ public static class DependencyInjectionSetup
         // Repositories
         services.AddScoped<INotificationLogRepository, NotificationLogRepository>();
 
-        // Services
-        services.AddScoped<INotificationSender, SimulatedNotificationSender>();
-        services.AddScoped<Application.Services.NotificationService>();
+        services.Configure<NotificationOptions>(configuration.GetSection("Notifications"));
+        services.AddScoped<INotificationSender, NotificationSender>();
+        services.AddScoped<Notification.Application.Services.NotificationService>();
 
         // Messaging
         services.AddSingleton<NotificationEventsConsumer>();

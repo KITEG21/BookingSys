@@ -1,3 +1,3 @@
 namespace Notification.Domain.Events;
 
-public record ClientBlocked(Guid ClientId, string Reason, DateTime BlockedAt);
+public record ClientBlocked(Guid ClientId, string ClientEmail, string Reason, DateTime BlockedAt);

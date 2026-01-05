@@ -1,3 +1,3 @@
 namespace Notification.Domain.Events;
 
-public record ReservationCancelled(Guid ReservationId);
+public record ReservationCancelled(Guid ReservationId, string ClientEmail);

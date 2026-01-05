@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
+using Reservation.Api.Services;
 using Reservation.Application.Commands.Post;
 using Reservation.Application.Interfaces;
 using Reservation.Application.Queries.GetAll;
@@ -64,6 +65,8 @@ public static class DependencyInjectionSetup
         services.AddScoped<IReservationRepository, EfReservationRepository>();
         services.AddScoped<ISagaRepository, SagaRepository>();
         services.AddScoped<ReservationSagaOrchestrator>();
+        services.AddHttpContextAccessor();
+        services.AddScoped<IUserContext, HttpContextUserContext>();
         services.AddSingleton<AvailabilityResponseConsumer>();
         services.AddSingleton<PaymentSettledConsumer>();
         services.AddSingleton<IEventBus, RabbitMqEventBus>();

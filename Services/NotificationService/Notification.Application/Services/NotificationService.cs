@@ -20,44 +20,44 @@ public class NotificationService
         _logger = logger;
     }
 
-    public async Task NotifyReservationConfirmedAsync(Guid reservationId)
+    public async Task NotifyReservationConfirmedAsync(Guid reservationId, string clientEmail)
     {
         var subject = "Reservation Confirmed";
         var body = $"Your reservation {reservationId} has been confirmed.";
 
-        await SendAndLogAsync("Email", "client@example.com", subject, body, "ReservationConfirmed", reservationId);
+        await SendAndLogAsync("Email", clientEmail, subject, body, "ReservationConfirmed", reservationId);
     }
 
-    public async Task NotifyReservationCancelledAsync(Guid reservationId)
+    public async Task NotifyReservationCancelledAsync(Guid reservationId, string clientEmail)
     {
         var subject = "Reservation Cancelled";
         var body = $"Your reservation {reservationId} has been cancelled.";
 
-        await SendAndLogAsync("Email", "client@example.com", subject, body, "ReservationCancelled", reservationId);
+        await SendAndLogAsync("Email", clientEmail, subject, body, "ReservationCancelled", reservationId);
     }
 
-    public async Task NotifyPaymentSettledAsync(Guid reservationId, Guid paymentId)
+    public async Task NotifyPaymentSettledAsync(Guid reservationId, Guid paymentId, string clientEmail)
     {
         var subject = "Payment Received";
         var body = $"Payment {paymentId} for reservation {reservationId} has been processed successfully.";
 
-        await SendAndLogAsync("Email", "client@example.com", subject, body, "PaymentSettled", reservationId);
+        await SendAndLogAsync("Email", clientEmail, subject, body, "PaymentSettled", reservationId);
     }
 
-    public async Task NotifyReservationCompletedAsync(Guid reservationId)
+    public async Task NotifyReservationCompletedAsync(Guid reservationId, string clientEmail)
     {
         var subject = "Reservation Completed";
         var body = $"Thank you! Your reservation {reservationId} has been completed. We hope to see you again!";
 
-        await SendAndLogAsync("Email", "client@example.com", subject, body, "ReservationCompleted", reservationId);
+        await SendAndLogAsync("Email", clientEmail, subject, body, "ReservationCompleted", reservationId);
     }
 
-    public async Task NotifyClientBlockedAsync(Guid clientId, string reason)
+    public async Task NotifyClientBlockedAsync(Guid clientId, string clientEmail, string reason)
     {
         var subject = "Account Suspended";
         var body = $"Your account has been suspended. Reason: {reason}";
 
-        await SendAndLogAsync("Email", "client@example.com", subject, body, "ClientBlocked", clientId);
+        await SendAndLogAsync("Email", clientEmail, subject, body, "ClientBlocked", clientId);
     }
 
     private async Task SendAndLogAsync(string channel, string recipient, string subject, string body, string eventType, Guid? relatedEntityId)

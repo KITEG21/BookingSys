@@ -1,9 +1,14 @@
-
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
+using Reservation.Api.Services;
 using Reservation.Api.ServicesExtensions;
+using Reservation.Application.Interfaces;
 using Reservation.Infrastructure.Messaging;
 using Reservation.Infrastructure.Persistence;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,10 +17,35 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
+builder.Services.AddHttpClient<IUserContext, HttpContextUserContext>(client =>
+{
+    var gatewayUrl = builder.Configuration["Services:Gateway"] ?? "http://localhost:5000";
+    client.BaseAddress = new Uri(gatewayUrl);
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+
 builder.Services.AddDependencyInjectionSetup(builder.Configuration); 
 
 
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "BookingSysSecretKey2025!MustBe32Chars";
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "BookingSys";
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtIssuer,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -39,6 +69,8 @@ _ = availabilityConsumer.Start();
 var paymentConsumer = app.Services.GetRequiredService<PaymentSettledConsumer>();
 _ = paymentConsumer.Start();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

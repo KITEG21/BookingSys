@@ -7,8 +7,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: reservation_db
-    ports:
-      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -73,6 +71,7 @@ services:
       - RabbitMQ__Port=5672
       - RabbitMQ__UserName=guest
       - RabbitMQ__Password=guest
+      - Services__Gateway=http://gateway:8080
     depends_on:
       postgres:
         condition: service_healthy
@@ -145,6 +144,11 @@ services:
       - RabbitMQ__Port=5672
       - RabbitMQ__UserName=guest
       - RabbitMQ__Password=guest
+      - Notifications__Smtp__Host=smtp.gmail.com
+      - Notifications__Smtp__Port=587
+      - Notifications__Smtp__Username=crowngamesteam@gmail.com
+      - Notifications__Smtp__Password=xemd vjzz wckx ucya
+      - Notifications__Smtp__From=crowngamesteam@gmail.com
     depends_on:
       postgres:
         condition: service_healthy

@@ -66,31 +66,31 @@ public class NotificationEventsConsumer
                 case "ReservationConfirmed":
                     var confirmed = JsonSerializer.Deserialize<ReservationConfirmed>(json);
                     if (confirmed != null)
-                        await notificationService.NotifyReservationConfirmedAsync(confirmed.ReservationId);
+                        await notificationService.NotifyReservationConfirmedAsync(confirmed.ReservationId, confirmed.ClientEmail);
                     break;
 
                 case "ReservationCancelled":
                     var cancelled = JsonSerializer.Deserialize<ReservationCancelled>(json);
                     if (cancelled != null)
-                        await notificationService.NotifyReservationCancelledAsync(cancelled.ReservationId);
+                        await notificationService.NotifyReservationCancelledAsync(cancelled.ReservationId, cancelled.ClientEmail);
                     break;
 
                 case "PaymentSettled":
                     var payment = JsonSerializer.Deserialize<PaymentSettled>(json);
                     if (payment != null)
-                        await notificationService.NotifyPaymentSettledAsync(payment.ReservationId, payment.PaymentId);
+                        await notificationService.NotifyPaymentSettledAsync(payment.ReservationId, payment.PaymentId, payment.ClientEmail);
                     break;
 
                 case "ReservationCompleted":
                     var completed = JsonSerializer.Deserialize<ReservationCompleted>(json);
                     if (completed != null)
-                        await notificationService.NotifyReservationCompletedAsync(completed.ReservationId);
+                        await notificationService.NotifyReservationCompletedAsync(completed.ReservationId, completed.ClientEmail);
                     break;
 
                 case "ClientBlocked":
                     var blocked = JsonSerializer.Deserialize<ClientBlocked>(json);
                     if (blocked != null)
-                        await notificationService.NotifyClientBlockedAsync(blocked.ClientId, blocked.Reason);
+                        await notificationService.NotifyClientBlockedAsync(blocked.ClientId, blocked.ClientEmail, blocked.Reason);
                     break;
             }
 

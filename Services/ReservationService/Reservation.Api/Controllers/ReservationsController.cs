@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Reservation.Application.Commands.Post;
@@ -8,6 +9,7 @@ using Reservation.Infrastructure.Messaging;
 
 namespace Reservation.Api.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ReservationsController : ControllerBase

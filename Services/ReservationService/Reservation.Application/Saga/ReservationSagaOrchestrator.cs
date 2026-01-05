@@ -45,9 +45,8 @@ public class ReservationSagaOrchestrator
         {
             reservation.Confirm();
             await _reservationRepository.UpdateAsync(reservation);
+            await _eventBus.PublishAsync(new ReservationConfirmed(reservation.Id, reservation.ClientEmail));
         }
-
-        await _eventBus.PublishAsync(new ReservationConfirmed(@event.ReservationId));
     }
 
     public async Task HandleAsync(AvailabilityRejected @event)
@@ -64,9 +63,8 @@ public class ReservationSagaOrchestrator
         {
             reservation.Cancel();
             await _reservationRepository.UpdateAsync(reservation);
+            await _eventBus.PublishAsync(new ReservationCancelled(reservation.Id, reservation.ClientEmail));
         }
-
-        await _eventBus.PublishAsync(new ReservationCancelled(@event.ReservationId));
     }
 
     public async Task HandleAsync(PaymentSettled @event)
@@ -75,7 +73,6 @@ public class ReservationSagaOrchestrator
         if (saga is null) return;
         if (saga.State == ReservationSagaState.Completed) return;
 
-        // only proceed if confirmed (or still waiting but we accept)
         saga.Complete();
         await _sagaRepository.UpdateAsync(saga);
 
@@ -84,8 +81,7 @@ public class ReservationSagaOrchestrator
         {
             reservation.Complete();
             await _reservationRepository.UpdateAsync(reservation);
+            await _eventBus.PublishAsync(new ReservationCompleted(reservation.Id, reservation.ClientEmail));
         }
-
-        await _eventBus.PublishAsync(new ReservationCompleted(@event.ReservationId));
     }
 }
