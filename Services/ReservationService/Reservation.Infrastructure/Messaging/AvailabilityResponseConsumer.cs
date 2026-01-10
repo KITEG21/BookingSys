@@ -3,7 +3,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Reservation.Domain.Events;
+using Shared.Events;
 using Reservation.Application.Saga;
 
 namespace Reservation.Infrastructure.Messaging;

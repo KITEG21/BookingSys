@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Shared.Interfaces;
+using Shared.Messaging;
 using Policy.Application.Interfaces;
 using Policy.Application.Services;
 using Policy.Infrastructure.Messaging;
@@ -63,7 +65,7 @@ public static class DependencyInjectionSetup
         services.AddScoped<PolicyEnforcementService>();
 
         // Messaging
-        services.AddSingleton<IEventBus, RabbitMqEventBus>();
+        services.AddSingleton<IEventBus, Shared.Messaging.RabbitMqEventBus>();
         services.AddSingleton<PolicyEventsConsumer>();
 
         return services;

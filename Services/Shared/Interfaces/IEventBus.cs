@@ -1,4 +1,6 @@
-namespace Policy.Application.Interfaces;
+using System;
+
+namespace Shared.Interfaces;
 
 public interface IEventBus
 {

@@ -1,7 +1,8 @@
 using Microsoft.Extensions.Logging;
+using Shared.Interfaces;
+using Shared.Events;
 using Policy.Application.Interfaces;
 using Policy.Domain.Entities;
-using Policy.Domain.Events;
 
 namespace Policy.Application.Services;
 

@@ -1,4 +1,5 @@
-using Availability.Application.Interfaces;
+using Shared.Interfaces;
+using Shared.Messaging;
 using Availability.Application.Services;
 using Availability.Infrastructure.Messaging;
 using RabbitMQ.Client;
@@ -35,7 +36,7 @@ public static class DependencyInjectionSetup
                 }
         });
 
-        services.AddSingleton<IEventBus, RabbitMqEventBus>();
+        services.AddSingleton<IEventBus, Shared.Messaging.RabbitMqEventBus>();
 
         // Application services
         services.AddSingleton<AvailabilityService>();

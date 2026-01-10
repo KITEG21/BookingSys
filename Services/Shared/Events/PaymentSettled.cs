@@ -1,4 +1,6 @@
-namespace Reservation.Domain.Events;
+using System;
+
+namespace Shared.Events;
 
 public record PaymentSettled(
     Guid ReservationId,

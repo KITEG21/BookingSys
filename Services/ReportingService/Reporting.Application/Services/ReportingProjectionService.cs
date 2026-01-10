@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Shared.Events;
 using Reporting.Application.Interfaces;
-using Reporting.Domain.Events;
 using Reporting.Domain.ReadModels;
 
 namespace Reporting.Application.Services;

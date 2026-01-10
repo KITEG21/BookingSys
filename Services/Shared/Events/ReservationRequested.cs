@@ -1,9 +1,8 @@
 using System;
 
-namespace Availability.Domain.Events;
+namespace Shared.Events;
 
-public record ReservationRequested
-(
+public record ReservationRequested(
     Guid ReservationId,
     Guid ClientId,
     DateTime Start,

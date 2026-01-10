@@ -2,9 +2,9 @@ using System;
 using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
-using Reservation.Application.Interfaces;
+using Shared.Interfaces;
 
-namespace Reservation.Infrastructure.Messaging;
+namespace Shared.Messaging;
 
 public class RabbitMqEventBus : IEventBus, IDisposable
 {

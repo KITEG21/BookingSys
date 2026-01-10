@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Shared.Interfaces;
+using Shared.Messaging;
 using RabbitMQ.Client;
 using Reservation.Api.Services;
 using Reservation.Application.Commands.Post;
@@ -69,7 +71,7 @@ public static class DependencyInjectionSetup
         services.AddScoped<IUserContext, HttpContextUserContext>();
         services.AddSingleton<AvailabilityResponseConsumer>();
         services.AddSingleton<PaymentSettledConsumer>();
-        services.AddSingleton<IEventBus, RabbitMqEventBus>();
+        services.AddSingleton<IEventBus, Shared.Messaging.RabbitMqEventBus>();
 
         return services;
     }

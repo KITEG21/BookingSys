@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Availability.Domain.Events;
+using Shared.Events;
 using Availability.Application.Services;
 using System.Threading.Tasks;
 

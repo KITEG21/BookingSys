@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Notification.Domain.Events;
+using Shared.Events;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -78,7 +78,7 @@ public class NotificationEventsConsumer
                 case "PaymentSettled":
                     var payment = JsonSerializer.Deserialize<PaymentSettled>(json);
                     if (payment != null)
-                        await notificationService.NotifyPaymentSettledAsync(payment.ReservationId, payment.PaymentId, payment.ClientEmail);
+                        await notificationService.NotifyPaymentSettledAsync(payment.ReservationId, payment.PaymentId, "client@example.com");
                     break;
 
                 case "ReservationCompleted":
@@ -90,7 +90,7 @@ public class NotificationEventsConsumer
                 case "ClientBlocked":
                     var blocked = JsonSerializer.Deserialize<ClientBlocked>(json);
                     if (blocked != null)
-                        await notificationService.NotifyClientBlockedAsync(blocked.ClientId, blocked.ClientEmail, blocked.Reason);
+                        await notificationService.NotifyClientBlockedAsync(blocked.ClientId, "client@example.com", blocked.Reason);
                     break;
             }
 

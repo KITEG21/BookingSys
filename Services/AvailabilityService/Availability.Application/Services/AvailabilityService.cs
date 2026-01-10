@@ -1,6 +1,6 @@
-using Availability.Application.Interfaces;
+using Shared.Interfaces;
+using Shared.Events;
 using Availability.Domain.Entities;
-using Availability.Domain.Events;
 
 namespace Availability.Application.Services;
 

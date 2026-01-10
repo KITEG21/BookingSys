@@ -1,5 +1,6 @@
+using Shared.Interfaces;
+using Shared.Events;
 using Reservation.Application.Interfaces;
-using Reservation.Domain.Events;
 using Reservation.Domain.Saga;
 using Reservation.Domain.Entities;
 

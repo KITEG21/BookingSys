@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Reporting.Application.Services;
-using Reporting.Domain.Events;
+using Shared.Events;
 
 namespace Reporting.Infrastructure.Messaging;
 

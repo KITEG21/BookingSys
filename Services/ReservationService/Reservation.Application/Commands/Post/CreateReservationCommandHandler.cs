@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Reservation.Application.Interfaces;
 using Reservation.Application.Saga;
-using Reservation.Domain.Events;
+using Shared.Events;
 
 namespace Reservation.Application.Commands.Post;
 

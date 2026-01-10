@@ -1,6 +1,6 @@
 using Payment.Application.Handlers;
-using Payment.Application.Interfaces;
-using Payment.Infrastructure.Messaging;
+using Shared.Interfaces;
+using Shared.Messaging;
 using RabbitMQ.Client;
 
 namespace Payment.Api.Extensions;
@@ -48,7 +48,7 @@ public static class DependencyInjectionSetup
         services.AddSingleton<IConnection>(sp => sp.GetRequiredService<Lazy<IConnection>>().Value);
 
         // Event bus
-        services.AddSingleton<IEventBus, RabbitMqEventBus>();
+        services.AddSingleton<IEventBus, Shared.Messaging.RabbitMqEventBus>();
 
         // Command handler
         services.AddTransient<SettlePaymentCommandHandler>();

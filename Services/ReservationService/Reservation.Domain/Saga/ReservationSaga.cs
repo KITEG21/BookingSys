@@ -1,5 +1,3 @@
-using Reservation.Domain.Events;
-
 namespace Reservation.Domain.Saga;
 
 public class ReservationSaga

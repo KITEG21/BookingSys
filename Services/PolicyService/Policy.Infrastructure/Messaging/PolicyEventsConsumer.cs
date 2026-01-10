@@ -3,7 +3,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Policy.Application.Services;
-using Policy.Domain.Events;
+using Shared.Events;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 

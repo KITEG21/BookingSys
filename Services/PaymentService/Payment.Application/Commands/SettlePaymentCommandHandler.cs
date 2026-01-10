@@ -1,7 +1,7 @@
 using Payment.Application.Commands;
-using Payment.Application.Interfaces;
+using Shared.Interfaces;
+using Shared.Events;
 using Payment.Domain.Entities;
-using Payment.Domain.Events;
 
 namespace Payment.Application.Handlers;
 

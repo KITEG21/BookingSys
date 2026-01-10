@@ -18,5 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Policy.Application\Policy.Application.csproj" />
     <ProjectReference Include="..\Policy.Infrastructure\Policy.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Shared\Shared.csproj" />
   </ItemGroup>
 </Project>
