@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Reporting.Api.Extensions;
 using Reporting.Infrastructure.Messaging;
 using Reporting.Infrastructure.Persistence;
@@ -7,6 +8,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddReportingServices(builder.Configuration);
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Reservation Service API",
+        Version = "v1",
+        Description = "Manages reservations and sagas"
+    });
+    // Optional: Add JWT security definition for auth-required endpoints
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Enter JWT token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer"
+    });
+});
 
 var app = builder.Build();
 
@@ -24,9 +44,10 @@ _ = consumer.StartAsync();
 app.UseHttpsRedirection();
 app.MapControllers();
 
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Reservation Service API v1");
+});
+
+app.Run();

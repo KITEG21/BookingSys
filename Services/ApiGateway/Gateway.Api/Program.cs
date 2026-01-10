@@ -4,6 +4,7 @@ using Gateway.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,6 +63,20 @@ builder.Services.AddCors(options =>
 // === Health Check ===
 builder.Services.AddHealthChecks();
 
+// === Swagger ===
+
+    // === Swagger (Development only) ===
+    builder.Services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "BookingSys API Gateway",
+            Version = "v1",
+            Description = "API Gateway for BookingSys microservices"
+        });
+    });
+
+
 var app = builder.Build();
 
 // === Apply Migrations ===
@@ -75,6 +90,14 @@ app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "BookingSys API Gateway v1");
+    });
+
 
 app.MapControllers();
 app.MapHealthChecks("/health");

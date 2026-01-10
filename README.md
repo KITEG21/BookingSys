@@ -252,110 +252,6 @@ The reservation process follows a choreography-based Saga pattern:
 | `PenaltyApplied` | PolicyWorker | AuditService |
 | `ClientBlocked` | PolicyWorker | NotificationWorker, AuditService |
 
-## 🗄️ Database Schema
-
-### PostgreSQL Tables
-
-**reservations**
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | UUID | Primary key |
-| ClientId | UUID | User ID |
-| Start | TIMESTAMPTZ | Reservation start |
-| End | TIMESTAMPTZ | Reservation end |
-| Status | VARCHAR | Pending/Confirmed/Cancelled/Completed |
-| CreatedAt | TIMESTAMPTZ | Created timestamp |
-| UpdatedAt | TIMESTAMPTZ | Last update timestamp |
-
-**reservation_sagas**
-| Column | Type | Description |
-|--------|------|-------------|
-| ReservationId | UUID | Primary key |
-| State | VARCHAR | Started/WaitingForAvailability/Confirmed/Rejected/Completed |
-| UpdatedAt | TIMESTAMPTZ | Last update timestamp |
-
-**users**
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | UUID | Primary key |
-| Email | VARCHAR | Unique email |
-| PasswordHash | VARCHAR | SHA256 hashed password |
-| FirstName | VARCHAR | First name |
-| LastName | VARCHAR | Last name |
-| Role | VARCHAR | User/Admin |
-| CreatedAt | TIMESTAMPTZ | Created timestamp |
-| LastLoginAt | TIMESTAMPTZ | Last login timestamp |
-| IsActive | BOOLEAN | Account status |
-
-**audit_entries**
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | UUID | Primary key |
-| EventType | VARCHAR | Event type name |
-| EntityId | UUID | Related entity ID |
-| EntityType | VARCHAR | Entity type name |
-| EventData | JSONB | Full event payload |
-| Actor | VARCHAR | User/system who triggered |
-| CorrelationId | UUID | Saga correlation ID |
-| OccurredAt | TIMESTAMPTZ | Event timestamp |
-
-**reservation_summaries**
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | UUID | Primary key |
-| ReservationId | UUID | Unique reservation reference |
-| ClientId | UUID | User ID |
-| Start | TIMESTAMPTZ | Reservation start |
-| End | TIMESTAMPTZ | Reservation end |
-| Status | VARCHAR | Current status |
-| ConfirmedAt | TIMESTAMPTZ | Confirmation timestamp |
-| CancelledAt | TIMESTAMPTZ | Cancellation timestamp |
-| CompletedAt | TIMESTAMPTZ | Completion timestamp |
-| PaidAt | TIMESTAMPTZ | Payment timestamp |
-| PaymentId | UUID | Payment reference |
-| LastUpdated | TIMESTAMPTZ | Last update timestamp |
-
-**daily_stats**
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | UUID | Primary key |
-| Date | DATE | Unique date |
-| TotalReservations | INT | Total reservations |
-| ConfirmedCount | INT | Confirmed count |
-| CancelledCount | INT | Cancelled count |
-| CompletedCount | INT | Completed count |
-| OccupancyRate | DECIMAL | Occupancy percentage |
-| LastUpdated | TIMESTAMPTZ | Last update timestamp |
-
-**client_violations**
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | UUID | Primary key |
-| ClientId | UUID | User ID |
-| ViolationType | VARCHAR | NoShow/LateCancellation |
-| ReservationId | UUID | Related reservation |
-| OccurredAt | TIMESTAMPTZ | Violation timestamp |
-
-**client_blocks**
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | UUID | Primary key |
-| ClientId | UUID | User ID |
-| Reason | VARCHAR | Block reason |
-| BlockedAt | TIMESTAMPTZ | Block start |
-| ExpiresAt | TIMESTAMPTZ | Block expiration |
-| IsActive | BOOLEAN | Block status |
-
-**notification_logs**
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | UUID | Primary key |
-| EventType | VARCHAR | Event that triggered notification |
-| Recipient | VARCHAR | Recipient identifier |
-| Channel | VARCHAR | Email/SMS/Push |
-| Message | TEXT | Notification content |
-| SentAt | TIMESTAMPTZ | Send timestamp |
-| Status | VARCHAR | Sent/Failed |
 
 ## 🛠️ Development
 
@@ -404,14 +300,18 @@ BookingSys/
     │   ├── Reporting.Application/
     │   ├── Reporting.Domain/
     │   └── Reporting.Infrastructure/
-    └── AuditService/
-        ├── Audit.Api/
-        ├── Audit.Application/
-        ├── Audit.Domain/
-        └── Audit.Infrastructure/
+    ├── AuditService/
+    │    ├── Audit.Api/
+    │    ├── Audit.Application/
+    │    ├── Audit.Domain/
+    │    └── Audit.Infrastructure/
+    └── Shared
+        ├── Events/
+        ├── Interfaces/
+        └── Messaging/
 ```
 
-### Run Locally (without Docker)
+### Run Locally
 
 ```bash
 # Start infrastructure

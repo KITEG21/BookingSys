@@ -1,16 +1,17 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY ["Payment.Api/Payment.Api.csproj", "Payment.Api/"]
-COPY ["Payment.Application/Payment.Application.csproj", "Payment.Application/"]
-COPY ["Payment.Domain/Payment.Domain.csproj", "Payment.Domain/"]
-COPY ["Payment.Infrastructure/Payment.Infrastructure.csproj", "Payment.Infrastructure/"]
+COPY ["Shared/Shared.csproj", "Shared/"]
+COPY ["PaymentService/Payment.Api/Payment.Api.csproj", "PaymentService/Payment.Api/"]
+COPY ["PaymentService/Payment.Application/Payment.Application.csproj", "PaymentService/Payment.Application/"]
+COPY ["PaymentService/Payment.Domain/Payment.Domain.csproj", "PaymentService/Payment.Domain/"]
+COPY ["PaymentService/Payment.Infrastructure/Payment.Infrastructure.csproj", "PaymentService/Payment.Infrastructure/"]
 
-RUN dotnet restore "Payment.Api/Payment.Api.csproj"
+RUN dotnet restore "PaymentService/Payment.Api/Payment.Api.csproj"
 
 COPY . .
 
-WORKDIR "/src/Payment.Api"
+WORKDIR "/src/PaymentService/Payment.Api"
 RUN dotnet publish "Payment.Api.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime

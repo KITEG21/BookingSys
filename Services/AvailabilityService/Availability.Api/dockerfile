@@ -4,8 +4,19 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
+
+COPY ["Shared/Shared.csproj", "Shared/"]
+COPY ["AvailabilityService/Availability.Api/Availability.Api.csproj", "AvailabilityService/Availability.Api/"]
+COPY ["AvailabilityService/Availability.Application/Availability.Application.csproj", "AvailabilityService/Availability.Application/"]
+COPY ["AvailabilityService/Availability.Domain/Availability.Domain.csproj", "AvailabilityService/Availability.Domain/"]
+COPY ["AvailabilityService/Availability.Infrastructure/Availability.Infrastructure.csproj", "AvailabilityService/Availability.Infrastructure/"]
+
+RUN dotnet restore "AvailabilityService/Availability.Api/Availability.Api.csproj"
+
 COPY . .
-RUN dotnet publish Availability.Api/Availability.Api.csproj -c Release -o /app/publish 
+
+WORKDIR "/src/AvailabilityService/Availability.Api"
+RUN dotnet publish "Availability.Api.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app

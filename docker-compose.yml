@@ -59,8 +59,8 @@ services:
   # === Core Services ===
   reservation-api:
     build:
-      context: ./Services/ReservationService
-      dockerfile: Reservation.Api/dockerfile
+      context: ./Services
+      dockerfile: ReservationService/Reservation.Api/dockerfile
     container_name: bookingsys-reservation-api
     ports:
       - "5001:8080"
@@ -80,8 +80,8 @@ services:
 
   availability-api:
     build:
-      context: ./Services/AvailabilityService
-      dockerfile: Availability.Api/dockerfile
+      context: ./Services
+      dockerfile: AvailabilityService/Availability.Api/dockerfile
     container_name: bookingsys-availability-api
     ports:
       - "5002:8080"
@@ -97,8 +97,8 @@ services:
 
   payment-api:
     build:
-      context: ./Services/PaymentService
-      dockerfile: Payment.Api/dockerfile
+      context: ./Services
+      dockerfile: PaymentService/Payment.Api/dockerfile
     container_name: bookingsys-payment-api
     ports:
       - "5003:8080"
@@ -116,8 +116,8 @@ services:
   # === Background Workers ===
   policy-worker:
     build:
-      context: ./Services/PolicyService
-      dockerfile: Policy.Worker/dockerfile
+      context: ./Services
+      dockerfile: PolicyService/Policy.Worker/dockerfile
     container_name: bookingsys-policy-worker
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -134,8 +134,8 @@ services:
 
   notification-worker:
     build:
-      context: ./Services/NotificationService
-      dockerfile: Notification.Worker/dockerfile
+      context: ./Services
+      dockerfile: NotificationService/Notification.Worker/dockerfile
     container_name: bookingsys-notification-worker
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -158,8 +158,8 @@ services:
   # === Query Services ===
   reporting-api:
     build:
-      context: ./Services/ReportingService
-      dockerfile: Reporting.Api/dockerfile
+      context: ./Services
+      dockerfile: ReportingService/Reporting.Api/dockerfile
     container_name: bookingsys-reporting-api
     ports:
       - "5006:8080"

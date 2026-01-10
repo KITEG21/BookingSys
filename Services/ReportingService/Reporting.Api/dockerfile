@@ -1,16 +1,17 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY ["Reporting.Api/Reporting.Api.csproj", "Reporting.Api/"]
-COPY ["Reporting.Application/Reporting.Application.csproj", "Reporting.Application/"]
-COPY ["Reporting.Domain/Reporting.Domain.csproj", "Reporting.Domain/"]
-COPY ["Reporting.Infrastructure/Reporting.Infrastructure.csproj", "Reporting.Infrastructure/"]
+COPY ["Shared/Shared.csproj", "Shared/"]
+COPY ["ReportingService/Reporting.Api/Reporting.Api.csproj", "ReportingService/Reporting.Api/"]
+COPY ["ReportingService/Reporting.Application/Reporting.Application.csproj", "ReportingService/Reporting.Application/"]
+COPY ["ReportingService/Reporting.Domain/Reporting.Domain.csproj", "ReportingService/Reporting.Domain/"]
+COPY ["ReportingService/Reporting.Infrastructure/Reporting.Infrastructure.csproj", "ReportingService/Reporting.Infrastructure/"]
 
-RUN dotnet restore "Reporting.Api/Reporting.Api.csproj"
+RUN dotnet restore "ReportingService/Reporting.Api/Reporting.Api.csproj"
 
 COPY . .
 
-WORKDIR "/src/Reporting.Api"
+WORKDIR "/src/ReportingService/Reporting.Api"
 RUN dotnet publish "Reporting.Api.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime

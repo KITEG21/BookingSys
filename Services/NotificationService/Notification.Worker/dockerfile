@@ -1,16 +1,17 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY ["Notification.Worker/Notification.Worker.csproj", "Notification.Worker/"]
-COPY ["Notification.Application/Notification.Application.csproj", "Notification.Application/"]
-COPY ["Notification.Domain/Notification.Domain.csproj", "Notification.Domain/"]
-COPY ["Notification.Infrastructure/Notification.Infrastructure.csproj", "Notification.Infrastructure/"]
+COPY ["Shared/Shared.csproj", "Shared/"]
+COPY ["NotificationService/Notification.Worker/Notification.Worker.csproj", "NotificationService/Notification.Worker/"]
+COPY ["NotificationService/Notification.Application/Notification.Application.csproj", "NotificationService/Notification.Application/"]
+COPY ["NotificationService/Notification.Domain/Notification.Domain.csproj", "NotificationService/Notification.Domain/"]
+COPY ["NotificationService/Notification.Infrastructure/Notification.Infrastructure.csproj", "NotificationService/Notification.Infrastructure/"]
 
-RUN dotnet restore "Notification.Worker/Notification.Worker.csproj"
+RUN dotnet restore "NotificationService/Notification.Worker/Notification.Worker.csproj"
 
 COPY . .
 
-WORKDIR "/src/Notification.Worker"
+WORKDIR "/src/NotificationService/Notification.Worker"
 RUN dotnet publish "Notification.Worker.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime

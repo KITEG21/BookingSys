@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 using Reservation.Api.Services;
 using Reservation.Api.ServicesExtensions;
@@ -16,6 +17,25 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Reservation Service API",
+        Version = "v1",
+        Description = "Manages reservations and sagas"
+    });
+    // Optional: Add JWT security definition for auth-required endpoints
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Enter JWT token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer"
+    });
+});
 
 builder.Services.AddHttpClient<IUserContext, HttpContextUserContext>(client =>
 {
@@ -54,6 +74,11 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Reservation Service API v1");
+});
 
 app.UseHttpsRedirection();
 

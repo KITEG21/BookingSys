@@ -4,8 +4,19 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
+
+COPY ["Shared/Shared.csproj", "Shared/"]
+COPY ["ReservationService/Reservation.Api/Reservation.Api.csproj", "ReservationService/Reservation.Api/"]
+COPY ["ReservationService/Reservation.Application/Reservation.Application.csproj", "ReservationService/Reservation.Application/"]
+COPY ["ReservationService/Reservation.Domain/Reservation.Domain.csproj", "ReservationService/Reservation.Domain/"]
+COPY ["ReservationService/Reservation.Infrastructure/Reservation.Infrastructure.csproj", "ReservationService/Reservation.Infrastructure/"]
+
+RUN dotnet restore "ReservationService/Reservation.Api/Reservation.Api.csproj"
+
 COPY . .
-RUN dotnet publish Reservation.Api/Reservation.Api.csproj -c Release -o /app/publish 
+
+WORKDIR "/src/ReservationService/Reservation.Api"
+RUN dotnet publish "Reservation.Api.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
