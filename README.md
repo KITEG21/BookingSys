@@ -101,6 +101,7 @@ docker compose down
 |---------|------|-------------|
 | **PostgreSQL** | 5433 | Primary database |
 | **RabbitMQ** | 5672 / 15672 | Message broker (AMQP / Management UI) |
+| **Seq** | 5341 | Centralized log aggregation and analysis |
 
 ## 🔐 Authentication
 
@@ -204,7 +205,24 @@ Content-Type: application/json
 | GET | `/api/audit` | Get all audit entries |
 | GET | `/api/audit/entity/{id}` | Get audit entries for entity |
 
-## 🔄 Saga Flow
+## � API Documentation
+
+Each API service provides interactive Swagger/OpenAPI documentation:
+
+- **API Gateway**: http://localhost:5000/swagger (aggregated routes)
+- **Reservation Service**: http://localhost:5001/swagger
+- **Availability Service**: http://localhost:5002/swagger
+- **Payment Service**: http://localhost:5003/swagger
+- **Reporting Service**: http://localhost:5006/swagger
+- **Audit Service**: http://localhost:5007/swagger
+
+Use the Swagger UI to:
+- Explore available endpoints
+- Test API calls interactively
+- View request/response schemas
+- Access authentication (Bearer token required for protected routes)
+
+## �🔄 Saga Flow
 
 The reservation process follows a choreography-based Saga pattern:
 
@@ -406,12 +424,34 @@ $audit = Invoke-RestMethod -Uri "http://localhost:5000/api/audit/entity/$reserva
 Write-Host "Audit Entries: $($audit.Count)"
 ```
 
-## 📈 Monitoring
+## 📈 Monitoring & Observability
 
 - **RabbitMQ Management UI**: http://localhost:15672 (guest/guest)
+- **Seq Log Aggregation**: http://localhost:5341 (no authentication required for development)
 - **Health Checks**: `GET /health` on each service
 - **Docker Logs**: `docker compose logs -f <service-name>`
 - **PostgreSQL**: Connect via any PostgreSQL client to `localhost:5433`
+
+### Logging with Serilog & Seq
+
+All services are configured with structured logging using **Serilog**:
+
+- **Console Output**: Real-time logs in Docker containers
+- **Seq Integration**: Centralized log aggregation for analysis and querying
+- **Enrichers**: Environment, thread ID, and service name metadata
+- **Structured Properties**: Consistent logging with placeholders (e.g., `{UserId}`, `{ReservationId}`)
+
+**Log Query Examples in Seq:**
+- `ServiceName = "Reservation.Api"` - Filter logs by service
+- `Level = "Error"` - Find error logs
+- `@Message like "Reservation created"` - Search by message content
+
+**Key Logging Points:**
+- API requests/responses in controllers
+- Event publishing/consumption
+- Database operations
+- Saga state transitions
+- Error handling and exceptions
 
 ## 🔒 Security
 
