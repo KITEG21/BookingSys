@@ -10,10 +10,12 @@ namespace Gateway.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
         _authService = authService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -23,6 +25,8 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
+        _logger.LogInformation("Registration attempt for email {Email}", request.Email);
+
         if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
         {
             return BadRequest(new { message = "Email and password are required" });
@@ -37,9 +41,10 @@ public class AuthController : ControllerBase
 
         if (result is null)
         {
+            _logger.LogWarning("Registration failed: User with email {Email} already exists", request.Email);
             return Conflict(new { message = "User with this email already exists" });
         }
-
+        _logger.LogInformation("User {UserId} registered successfully", result.UserId);
         return CreatedAtAction(nameof(GetCurrentUser), new { id = result.UserId }, result);
     }
 
@@ -50,6 +55,8 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
+        _logger.LogInformation("Login attempt for email {Email}", request.Email);
+    
         if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
         {
             return BadRequest(new { message = "Email and password are required" });
@@ -59,9 +66,10 @@ public class AuthController : ControllerBase
 
         if (result is null)
         {
+            _logger.LogWarning("Login failed for email {Email}: Invalid credentials", request.Email);
             return Unauthorized(new { message = "Invalid email or password" });
         }
-
+        _logger.LogInformation("User {UserId} logged in successfully", result.UserId);    
         return Ok(result);
     }
 
@@ -72,6 +80,8 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetCurrentUser()
     {
+    _logger.LogInformation("Get current user info attempt");
+
         var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
                        ?? User.FindFirst("sub")?.Value;
 
@@ -84,7 +94,9 @@ public class AuthController : ControllerBase
 
         if (user is null)
         {
+            _logger.LogWarning("User not found for ID {UserId}", userId);
             return NotFound(new { message = "User not found" });
+
         }
 
         return Ok(user);
@@ -97,6 +109,7 @@ public class AuthController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAllUsers()
     {
+        _logger.LogInformation("Retrieving all users attempt by Admin");
         var users = await _authService.GetAllUsersAsync();
         return Ok(users);
     }
@@ -108,10 +121,12 @@ public class AuthController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUserById(Guid id)
     {
+        _logger.LogInformation("Retrieving user info attempt for UserId {UserId} by Admin", id);
         var user = await _authService.GetUserByIdAsync(id);
 
         if (user is null)
         {
+            _logger.LogWarning("User not found for ID {UserId}", id);
             return NotFound(new { message = "User not found" });
         }
 

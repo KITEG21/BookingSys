@@ -39,13 +39,18 @@ public static class DependencyInjectionSetup
         services.AddSingleton<IEventBus, Shared.Messaging.RabbitMqEventBus>();
 
         // Application services
-        services.AddSingleton<AvailabilityService>();
+        services.AddSingleton<AvailabilityService>(sp => 
+            new AvailabilityService(
+                sp.GetRequiredService<IEventBus>(),
+                sp.GetRequiredService<ILogger<AvailabilityService>>()
+            ));
 
-        services.AddSingleton<ReservationRequestedConsumer>();
-
-
-
-
+        services.AddSingleton<ReservationRequestedConsumer>(sp => 
+            new ReservationRequestedConsumer(
+                sp.GetRequiredService<IConnection>(),
+                sp.GetRequiredService<AvailabilityService>(),
+                sp.GetRequiredService<ILogger<ReservationRequestedConsumer>>()
+            ));
 
         return services;
     }

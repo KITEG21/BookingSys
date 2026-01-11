@@ -41,7 +41,10 @@ public class AuditService
 
     public async Task<IEnumerable<AuditEntry>> GetAuditTrailAsync(Guid entityId)
     {
-        return await _repository.GetByEntityIdAsync(entityId);
+        _logger.LogDebug("Retrieving audit trail for entity {EntityId}", entityId);
+        var entries = await _repository.GetByEntityIdAsync(entityId);
+        _logger.LogDebug("Retrieved {Count} entries for entity {EntityId}", entries.Count(), entityId);
+        return entries;
     }
 
     public async Task<IEnumerable<AuditEntry>> SearchAsync(
@@ -51,6 +54,10 @@ public class AuditService
         DateTime? end = null,
         int limit = 100)
     {
-        return await _repository.SearchAsync(eventType, entityId, start, end, limit);
+        _logger.LogDebug("Searching audit entries with filters: EventType={EventType}, EntityId={EntityId}, Start={Start}, End={End}, Limit={Limit}", 
+            eventType, entityId, start, end, limit);
+        var entries = await _repository.SearchAsync(eventType, entityId, start, end, limit);
+        _logger.LogDebug("Search returned {Count} entries", entries.Count());
+        return entries;
     }
 }

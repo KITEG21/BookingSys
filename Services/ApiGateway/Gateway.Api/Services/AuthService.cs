@@ -21,18 +21,22 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthService(IUserRepository userRepository, IConfiguration configuration)
+    public AuthService(IUserRepository userRepository, IConfiguration configuration, ILogger<AuthService> logger)
     {
         _userRepository = userRepository;
         _configuration = configuration;
+        _logger = logger;
     }
 
     public async Task<AuthResponse?> RegisterAsync(RegisterRequest request)
     {
+        _logger.LogInformation("Creating new user with email: {NewUserEmail}", request.Email);
         // Check if user already exists
         if (await _userRepository.ExistsAsync(request.Email))
         {
+            _logger.LogWarning("User with email: {NewUserEmail}, already exists", request.Email);
             return null;
         }
 
@@ -47,21 +51,24 @@ public class AuthService : IAuthService
         };
 
         await _userRepository.CreateAsync(user);
-
+        _logger.LogInformation("Created successfully user with email: {NewUserEmail}", user.Email);
         return GenerateAuthResponse(user);
     }
 
     public async Task<AuthResponse?> LoginAsync(LoginRequest request)
     {
+        _logger.LogDebug("Validating credentials for {Email}", request.Email);
         var user = await _userRepository.GetByEmailAsync(request.Email);
 
         if (user is null || !VerifyPassword(request.Password, user.PasswordHash))
         {
+            _logger.LogWarning("Invalid login attempt for {Email}", request.Email);
             return null;
         }
 
         if (!user.IsActive)
         {
+            _logger.LogInformation("The user: {Email} is Inactive", request.Email);
             return null;
         }
 
@@ -69,6 +76,7 @@ public class AuthService : IAuthService
         user.LastLoginAt = DateTime.UtcNow;
         await _userRepository.UpdateAsync(user);
 
+        _logger.LogInformation("User {UserId} authenticated", user.Id);
         return GenerateAuthResponse(user);
     }
 

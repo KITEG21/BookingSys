@@ -1,7 +1,25 @@
 using Microsoft.OpenApi.Models;
 using Payment.Api.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithThreadId()
+    .Enrich.WithProperty("ServiceName", "Payment.Api")
+    .WriteTo.Console()  // Keep console for Docker logs
+    .WriteTo.Seq(builder.Configuration["Seq:Url"] ?? "http://seq:5341")
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+try
+{
+    
+
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
@@ -43,3 +61,12 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application start-up failed");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

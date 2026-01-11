@@ -62,7 +62,12 @@ public static class DependencyInjectionSetup
         services.AddScoped<AuditService>();
 
         // Messaging
-        services.AddSingleton<AuditEventsConsumer>();
+        services.AddSingleton<AuditEventsConsumer>(sp => 
+            new AuditEventsConsumer(
+                sp.GetRequiredService<IConnection>(),
+                sp.GetRequiredService<IServiceScopeFactory>(),
+                sp.GetRequiredService<ILogger<AuditEventsConsumer>>()
+            ));
 
         return services;
     }

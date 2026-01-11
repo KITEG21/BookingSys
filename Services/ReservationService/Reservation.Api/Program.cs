@@ -9,10 +9,25 @@ using Reservation.Api.ServicesExtensions;
 using Reservation.Application.Interfaces;
 using Reservation.Infrastructure.Messaging;
 using Reservation.Infrastructure.Persistence;
+using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithThreadId()
+    .Enrich.WithProperty("ServiceName", "Reservation.Api")
+    .WriteTo.Console()  // Keep console for Docker logs
+    .WriteTo.Seq(builder.Configuration["Seq:Url"] ?? "http://seq:5341")
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+try{
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -99,4 +114,12 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application start-up failed");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

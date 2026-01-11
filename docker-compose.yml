@@ -29,6 +29,22 @@ services:
       timeout: 5s
       retries: 10
 
+  seq:
+    image: datalust/seq:latest
+    container_name: bookingsys-seq
+    ports:
+      - "5341:80"  # Seq UI on http://localhost:5341
+    environment:
+      - ACCEPT_EULA=Y  # Accept EULA for non-interactive setup
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true  # Disable authentication for development
+    volumes:
+      - seq_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3    
+
   # === API Gateway ===
   gateway:
     build:
@@ -199,3 +215,4 @@ services:
 volumes:
   postgres_data:
   rabbitmq_data:
+  seq_data:

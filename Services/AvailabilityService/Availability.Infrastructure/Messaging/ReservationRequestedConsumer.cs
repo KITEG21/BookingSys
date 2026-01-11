@@ -5,6 +5,7 @@ using RabbitMQ.Client.Events;
 using Shared.Events;
 using Availability.Application.Services;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Availability.Infrastructure.Messaging;
 
@@ -17,15 +18,18 @@ public class ReservationRequestedConsumer
     private readonly IConnection _connection;
     private IChannel? _channel;
     private readonly AvailabilityService _availabilityService;
+    private readonly ILogger<ReservationRequestedConsumer> _logger;
 
-    public ReservationRequestedConsumer(IConnection connection, AvailabilityService availabilityService)
+    public ReservationRequestedConsumer(IConnection connection, AvailabilityService availabilityService, ILogger<ReservationRequestedConsumer> logger)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _availabilityService = availabilityService;
+        _logger = logger;
     }
 
     public async Task Start()
     {
+        _logger.LogInformation("Starting ReservationRequestedConsumer");
         _channel ??= await _connection.CreateChannelAsync();
 
         // Exchange & queue setup
@@ -43,15 +47,19 @@ public class ReservationRequestedConsumer
 
                 if (message is null)
                 {
+                    _logger.LogWarning("Received invalid message, nacking");
                     await _channel.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: false);
                     return;
                 }
 
+                _logger.LogInformation("Processing ReservationRequested for ReservationId {ReservationId}", message.ReservationId);
                 await _availabilityService.HandleAsync(message);
                 await _channel.BasicAckAsync(ea.DeliveryTag, multiple: false);
+                _logger.LogInformation("Successfully processed ReservationRequested for ReservationId {ReservationId}", message.ReservationId);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error processing message, requeueing");
                 // On error requeue (or set to false per your policy)
                 await _channel.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: true);
             }

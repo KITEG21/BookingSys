@@ -9,15 +9,18 @@ namespace Payment.Api.Controllers;
 public class PaymentsController : ControllerBase
 {
     private readonly SettlePaymentCommandHandler _handler;
+    private readonly ILogger<PaymentsController> _logger;
 
-    public PaymentsController(SettlePaymentCommandHandler handler)
+    public PaymentsController(SettlePaymentCommandHandler handler, ILogger<PaymentsController> logger)
     {
         _handler = handler;
+        _logger = logger;
     }
 
     [HttpPost("settle")]
     public async Task<IActionResult> Settle([FromBody] SettlePaymentCommand command)
     {
+        _logger.LogInformation("Settling payment for reservation: {ReservationId}", command.ReservationId);
         var payment = await _handler.Handle(command);
         return Ok(payment);
     }

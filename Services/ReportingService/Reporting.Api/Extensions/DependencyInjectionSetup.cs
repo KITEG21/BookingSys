@@ -61,11 +61,21 @@ public static class DependencyInjectionSetup
         services.AddScoped<IDailyStatsRepository, DailyStatsRepository>();
 
         // Services
-        services.AddScoped<ReportingProjectionService>();
+        services.AddScoped<ReportingProjectionService>(sp => 
+            new ReportingProjectionService(
+                sp.GetRequiredService<IReservationSummaryRepository>(),
+                sp.GetRequiredService<IDailyStatsRepository>(),
+                sp.GetRequiredService<ILogger<ReportingProjectionService>>()
+            ));
         services.AddScoped<ReportQueries>();
 
         // Messaging
-        services.AddSingleton<ReportingEventsConsumer>();
+        services.AddSingleton<ReportingEventsConsumer>(sp => 
+            new ReportingEventsConsumer(
+                sp.GetRequiredService<IConnection>(),
+                sp.GetRequiredService<IServiceScopeFactory>(),
+                sp.GetRequiredService<ILogger<ReportingEventsConsumer>>()
+            ));
 
         return services;
     }

@@ -3,51 +3,77 @@ using Microsoft.OpenApi.Models;
 using Reporting.Api.Extensions;
 using Reporting.Infrastructure.Messaging;
 using Reporting.Infrastructure.Persistence;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddReportingServices(builder.Configuration);
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithThreadId()
+    .Enrich.WithProperty("ServiceName", "Reporting.Api")
+    .WriteTo.Console()
+    .WriteTo.Seq(builder.Configuration["Seq:Url"] ?? "http://seq:5341")
+    .CreateLogger();
 
-builder.Services.AddSwaggerGen(options =>
+builder.Host.UseSerilog();
+
+try
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Reservation Service API",
-        Version = "v1",
-        Description = "Manages reservations and sagas"
-    });
-    // Optional: Add JWT security definition for auth-required endpoints
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Enter JWT token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer"
-    });
-});
+    Log.Information("Starting {ServiceName}", "Reporting.Api");
 
-var app = builder.Build();
+    builder.Services.AddControllers();
+    builder.Services.AddReportingServices(builder.Configuration);
 
-// Run migrations
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<ReportingDbContext>();
-    db.Database.Migrate();
+    builder.Services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "Reporting Service API",
+            Version = "v1",
+            Description = "Manages reporting"
+        });
+        // Optional: Add JWT security definition for auth-required endpoints
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Enter JWT token",
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "Bearer"
+        });
+    });
+
+    var app = builder.Build();
+
+    // Run migrations
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ReportingDbContext>();
+        db.Database.Migrate();
+    }
+
+    // Start event consumer
+    var consumer = app.Services.GetRequiredService<ReportingEventsConsumer>();
+    _ = consumer.StartAsync();
+
+    app.UseHttpsRedirection();
+    app.MapControllers();
+
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Reporting Service API v1");
+    });
+
+    app.Run();
 }
-
-// Start event consumer
-var consumer = app.Services.GetRequiredService<ReportingEventsConsumer>();
-_ = consumer.StartAsync();
-
-app.UseHttpsRedirection();
-app.MapControllers();
-
-app.UseSwagger();
-app.UseSwaggerUI(options =>
+catch (Exception ex)
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Reservation Service API v1");
-});
-
-app.Run();
+    Log.Fatal(ex, "Application start-up failed for {ServiceName}", "Reporting.Api");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
